@@ -1,0 +1,3 @@
+inventories/*/group_vars/*
+inventories/*/hosts
+files/*
