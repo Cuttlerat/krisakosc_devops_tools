@@ -1,0 +1,15 @@
+---
+- name: Start nginx-proxy
+  docker_container:
+      image: "jwilder/nginx-proxy"
+      name: nginx-proxy
+      recreate: yes
+      restart_policy: always
+      ports:
+          - 80:80
+          - 443:443
+      volumes:
+          - /etc/nginx/vhost.d
+          - /usr/share/nginx/html
+          - /etc/nginx/certs:/etc/nginx/certs:ro
+          - /var/run/docker.sock:/tmp/docker.sock:ro

@@ -1,0 +1,49 @@
+---
+- name: install dependencies
+  package:
+    name: "{{ item }}"
+  with_items:
+    - python-pip
+    - python-setuptools
+
+- name: install pip dependencies
+  pip:
+    name: "{{ item }}"
+  with_items:
+    - docker-py==1.9.0 # https://github.com/ansible/ansible-modules-core/issues/5335
+
+- name: check that the docker is not installed
+  command: which docker
+  ignore_errors: yes
+  register: docker_status
+
+- name: add gpg key
+  apt_key:
+    keyserver: hkp://ha.pool.sks-keyservers.net:80
+    id: 58118E89F3A912897C070ADBF76221572C52609D
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and docker_status.rc == 1
+
+- name: add apt repository
+  apt_repository:
+    repo: "deb https://apt.dockerproject.org/repo ubuntu-{{ ansible_distribution_release }} main"
+    update_cache: yes
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and docker_status.rc == 1
+
+- name: install docker on ubuntu/debian
+  apt:
+    name: docker-engine
+    install_recommends: no
+  when: (ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu') and docker_status.rc == 1
+
+- name: install docker on centos/rhel
+  yum: name=docker-ce state=latest
+  when: (ansible_distribution == 'CentOS' or ansible_distribution == 'Red Hat Enterprise Linux') and docker_status.rc == 1
+
+- name: make sure docker is running
+  service: name=docker state=started
+
+- name: add user to docker group
+  user:
+    name: "{{ ansible_user }}"
+    groups: docker
+    append: yes
