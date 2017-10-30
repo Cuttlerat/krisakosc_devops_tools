@@ -1,0 +1,26 @@
+---
+- name: Create grafana dir
+  file:
+      path: /opt/data/grafana/config
+      state: directory
+
+- name: Copy grafana configs
+  template:
+      src: "grafana.ini.j2"
+      dest: "/opt/data/grafana/config/grafana.ini"
+
+- name: Start grafana container
+  docker_container:
+    image: grafana/grafana:4.3.0-beta1
+    name: grafana
+    env:
+        VIRTUAL_HOST: monitoring.cuttlerat.ru
+        VIRTUAL_PORT: 3000
+        LETSENCRYPT_HOST: monitoring.cuttlerat.ru
+        LETSENCRYPT_EMAIL: avkioller@gmail.com
+    volumes:
+        - /opt/data/grafana:/var/lib/grafana
+        - /opt/data/grafana/config/grafana.ini:/etc/grafana/grafana.ini
+    links:
+        - influxdb
+

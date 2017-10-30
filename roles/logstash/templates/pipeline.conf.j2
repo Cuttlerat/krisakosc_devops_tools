@@ -1,0 +1,62 @@
+input {
+  http_poller {
+    urls => {
+      myresource_1_1 => "https://api.cryptonator.com/api/ticker/btc-usd"
+      myresource_1_2 => "https://api.cryptonator.com/api/ticker/bch-usd"
+      myresource_1_3 => "https://api.cryptonator.com/api/ticker/eth-usd"
+      myresource_1_4 => "https://api.cryptonator.com/api/ticker/xmr-usd"
+      }
+    request_timeout => 60
+    interval => 60
+    codec => "json"
+  }
+  http_poller {
+    urls => {
+      myresource_2_1 => "https://api.cryptonator.com/api/ticker/btc-rur"
+      myresource_2_2 => "https://api.cryptonator.com/api/ticker/bch-rur"
+      myresource_2_3 => "https://api.cryptonator.com/api/ticker/eth-rur"
+      myresource_2_4 => "https://api.cryptonator.com/api/ticker/xmr-rur"
+      }
+    request_timeout => 60
+    interval => 300
+    codec => "json"
+  }
+}
+
+filter {
+  json {
+    source => "message"
+  }
+
+  mutate {
+      convert => {
+          "[ticker][price]" => "float"
+      }
+      rename => {
+          "[ticker][price]" => "price"
+          "[ticker][target]" => "target"
+          "[ticker][base]" => "base"
+      }
+      remove_field => ["ticker"]
+  }
+
+  mutate {
+      add_field => {
+          "[@metadata][measurement]" => "price"
+      }
+  }
+}
+
+output {
+  influxdb {
+    idle_flush_time => 10
+    host => "influxdb"
+    user => "{{ influxdb_user }}"
+    password => "{{ influxdb_password }}"
+    db => "metrics"
+    measurement => "%{[@metadata][measurement]}"
+    use_event_fields_for_data_points => true
+    # retention_policy => "two_weeks"
+    send_as_tags => ["target", "base"]
+  }
+}
