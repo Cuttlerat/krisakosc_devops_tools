@@ -1,0 +1,24 @@
+---
+- name: Create directory
+  file:
+      path: "/opt/data/files_hotkosc"
+      state: directory
+
+- name: Copy nginx config
+  template:
+      src: "files.hotkosc.conf.j2"
+      dest: "/opt/data/files_hotkosc/files.hotkosc.conf"
+
+- name: Start files container
+  docker_container:
+      image: nginx
+      name: files_hotkosc
+      env:
+          VIRTUAL_HOST: files.hotkosc.ru
+          VIRTUAL_PORT: 80
+          LETSENCRYPT_HOST: files.hotkosc.ru
+          LETSENCRYPT_EMAIL: hotkosc@gmail.com
+      volumes:
+        - /opt/data/files_hotkosc/files:/files
+        - /opt/data/files_hotkosc/hotkosc.conf:/etc/nginx/conf.d/hotkosc.conf:ro
+

@@ -1,0 +1,22 @@
+---
+- name: Start minecraft-server container
+  docker_container:
+      image: java:8-jdk
+      name: minecraft-server
+      interactive: yes
+      tty: yes
+      working_dir: "/data"
+      entrypoint: "/data/entrypoint.sh"
+      restart_policy: always
+      env:
+          VIRTUAL_HOST: minecraft.hotkosc.ru
+          VIRTUAL_PORT: 8123
+          LETSENCRYPT_HOST: minecraft.hotkosc.ru
+          LETSENCRYPT_EMAIL: hotkosc@gmail.com
+          JAVA_TOOL_OPTIONS: -Dfml.queryResult=confirm
+      volumes:
+          - "/opt/data/minecraft:/data"
+      ports:
+          - "22565:25565"
+      expose:
+          - 8123

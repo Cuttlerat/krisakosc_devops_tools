@@ -1,0 +1,67 @@
+---
+#TODO git clone fastpost
+- name: Create fastpost directory
+  file:
+    path: /opt/data/fastpost
+    state: directory
+
+- name: Start postgres
+  docker_container:
+      image: postgres:9.5
+      name: fastpost_postgres
+      recreate: no
+      env:
+          POSTGRES_PASSWORD: "{{ postgres_password }}"
+      volumes:
+          - /opt/data/fastpost/data:/var/lib/postgresql/data
+      restart_policy: always
+      state: started
+
+- name: Build image
+  docker_image:
+      path: /opt/data/fastpost
+      dockerfile: /opt/data/fastpost/dockerfiles/fastpost.Dockerfile
+      name: fastpost
+
+- name: Start migration
+  docker_container:
+      image: fastpost
+      name: fastpost_migration
+      volumes:
+          - /opt/data/fastpost/data:/fastpost/data
+          - /opt/data/fastpost/static:/fastpost/static
+      command: bash -c "python manage.py collectstatic --noinput && python manage.py migrate"
+      links:
+          - fastpost_postgres
+      state: started
+
+- name: Start fastpost
+  docker_container:
+      image: fastpost
+      name: fastpost
+      volumes:
+          - /opt/data/fastpost/data:/fastpost/data
+      command: python manage.py runserver 0.0.0.0:8000
+      expose:
+          - 8000
+      links:
+          - fastpost_postgres
+      restart_policy: always
+
+- name: Start nginx
+  docker_container:
+      image: nginx:1.13.3
+      name: fastpost_nginx
+      volumes:
+          - /opt/data/fastpost/nginx:/etc/nginx/conf.d
+          - /opt/data/fastpost/static:/fastpost/static
+      env:
+          VIRTUAL_HOST: fastpost.hotkosc.ru
+          VIRTUAL_PORT: 8000
+          LETSENCRYPT_HOST: fastpost.hotkosc.ru
+          LETSENCRYPT_EMAIL: hotkosc@gmail.com
+      expose:
+          - "8000"
+      links:
+          - fastpost
+      restart_policy: always

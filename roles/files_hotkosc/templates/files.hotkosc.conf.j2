@@ -1,0 +1,9 @@
+server {
+    listen       80;
+    server_name  files.hotkosc.ru;
+
+    location / {
+        root   /files;
+        autoindex on;
+    }
+}

@@ -1,0 +1,29 @@
+---
+- name: Create telegraf directory
+  file:
+      path: /opt/data/telegraf
+      state: directory
+
+- name: Copy config
+  template:
+      src: "telegraf.conf.j2"
+      dest: "/opt/data/telegraf/telegraf.conf"
+
+- name: Start telegraf container
+  docker_container:
+      image: telegraf
+      name: telegraf
+      recreate: yes
+      volumes:
+          - /opt/data/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
+          - /var/run/docker.sock:/var/run/docker.sock:ro
+          - /sys:/rootfs/sys:ro
+          - /proc:/rootfs/proc:ro
+          - /etc:/rootfs/etc:ro
+          - /var/run/utmp:/var/run/utmp:ro
+      links:
+          - influxdb
+      env:
+          HOST_PROC: /rootfs/proc
+          HOST_SYS: /rootfs/sys
+          HOST_ETC: /rootfs/etc
