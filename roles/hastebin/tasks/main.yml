@@ -1,0 +1,23 @@
+---
+- name: Start redis container
+  docker_container:
+      image: redis
+      name: redis
+
+- name: Start hastebin container
+  docker_container:
+      image: "rlister/hastebin"
+      name: hastebin
+      env:
+          - STORAGE_TYP: redis
+          - STORAGE_HOST: redis
+          - VIRTUAL_HOST: hastebin.cuttlerat.ru
+          - VIRTUAL_PORT: 7777
+          - LETSENCRYPT_HOST: hastebin.cuttlerat.ru
+          - LETSENCRYPT_EMAIL: avkioller@gmail.com
+      restart: always
+      expose:
+          - 7777
+      links:
+          - redis
+

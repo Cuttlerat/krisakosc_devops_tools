@@ -1,0 +1,8 @@
+---
+- name: Copy builder script
+  copy:
+      src: "files/builder.sh"
+      dest: "/opt/data/pybot/builder.sh"
+
+- name: Run builder
+  shell: daemon -- /opt/data/pybot/buildes.sh &>/var/log/builder.log
