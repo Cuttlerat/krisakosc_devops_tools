@@ -34,9 +34,12 @@
       env:
           USERNAME: "{{ item.email }}"
           THREADS: "{{ item.threads }}"
-      volumes:
-          - /opt/data/monero-miner/moneroCPU.sh:/usr/local/bin/moneroCPU.sh:ro
   with_items: "{{ monero_users }}"
 
 - name: Run CPU-bind
   shell: /opt/data/monero-miner/CPU-bind.sh
+
+- name: Delete files
+  file:
+      path: "/opt/data/monero-miner"
+      state: absent
