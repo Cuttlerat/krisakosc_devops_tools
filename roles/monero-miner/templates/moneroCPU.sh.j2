@@ -1,0 +1,10 @@
+#!/bin/bash
+#Docker CPU version
+
+git clone https://github.com/wolf9466/cpuminer-multi
+
+cd cpuminer-multi/
+./autogen.sh
+CFLAGS="-march=native" ./configure
+make
+./minerd -a cryptonight -o stratum+tcp://xmr.pool.minergate.com:45560 -u ${USERNAME} -p x -t ${THREADS}
