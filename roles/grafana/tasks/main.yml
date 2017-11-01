@@ -18,6 +18,7 @@
         VIRTUAL_PORT: 3000
         LETSENCRYPT_HOST: monitoring.cuttlerat.ru
         LETSENCRYPT_EMAIL: avkioller@gmail.com
+        GF_SERVER_ROOT_URL: https://monitoring.cuttlerat.ru
     volumes:
         - /opt/data/grafana:/var/lib/grafana
         - /opt/data/grafana/config/grafana.ini:/etc/grafana/grafana.ini

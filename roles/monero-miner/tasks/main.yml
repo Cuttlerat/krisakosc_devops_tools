@@ -12,6 +12,7 @@
       - Dockerfile
       - moneroCPU.sh
       - CPU-bind.sh
+  register: configs
 
 - name: Check scripts
   file:
@@ -24,20 +25,27 @@
 - name: Build image
   docker_image:
       name: monero_miner
+      force: "{{ 'yes' if configs.changed else 'no' }}"
       path: "/opt/data/monero-miner"
 
 - name: Run dockers
   docker_container:
       image: monero_miner
       name: "miner_{{ item.username }}"
-      recreate: yes
+      recreate: "{{ 'yes' if configs.changed else 'no' }}"
+      log_driver: gelf
+      log_options:
+          gelf-address: udp://localhost:12201
+          tag: "miner_{{ item.username }}"
       env:
-          USERNAME: "{{ item.email }}"
+          EMAIL: "{{ item.email }}"
           THREADS: "{{ item.threads }}"
+          USERNAME: "{{ item.username }}"
   with_items: "{{ monero_users }}"
 
 - name: Run CPU-bind
   shell: /opt/data/monero-miner/CPU-bind.sh
+  when: configs.changed
 
 - name: Delete files
   file:

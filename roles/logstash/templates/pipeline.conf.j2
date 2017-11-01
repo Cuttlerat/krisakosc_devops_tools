@@ -5,6 +5,7 @@ input {
       myresource_1_2 => "https://api.cryptonator.com/api/ticker/bch-usd"
       myresource_1_3 => "https://api.cryptonator.com/api/ticker/eth-usd"
       myresource_1_4 => "https://api.cryptonator.com/api/ticker/xmr-usd"
+      myresource_1_5 => "https://min-api.cryptocompare.com/data/price?fsym=MCN&tsyms=USD"
       }
     request_timeout => 60
     interval => 60
@@ -21,9 +22,25 @@ input {
     interval => 300
     codec => "json"
   }
+  gelf{}
 }
 
 filter {
+  if [message] =~ /.*accepted.*/ {
+
+    grok {
+      match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\..*"}
+    }
+
+    mutate {
+      add_field => ["miner_name", "%{container_name}"]
+    }
+    mutate {
+      add_field => {
+          "[@metadata][measurement]" => "miner"
+      }
+    }
+  } else {
   json {
     source => "message"
   }
@@ -33,6 +50,7 @@ filter {
           "[ticker][price]" => "float"
       }
       rename => {
+          "[ticker][USD]" => "price"
           "[ticker][price]" => "price"
           "[ticker][target]" => "target"
           "[ticker][base]" => "base"
@@ -44,6 +62,7 @@ filter {
       add_field => {
           "[@metadata][measurement]" => "price"
       }
+    }
   }
 }
 
@@ -56,7 +75,7 @@ output {
     db => "metrics"
     measurement => "%{[@metadata][measurement]}"
     use_event_fields_for_data_points => true
-    # retention_policy => "two_weeks"
-    send_as_tags => ["target", "base"]
+    retention_policy => "two_weeks"
+    send_as_tags => ["target", "base", "miner_name"]
   }
 }
