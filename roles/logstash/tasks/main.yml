@@ -16,6 +16,7 @@
   with_items:
       - logstash.yml
       - pipeline.conf
+  register: config
 
 - name: Create logstash image
   docker_image:
@@ -27,7 +28,9 @@
   docker_container:
       name: logstash
       image: logstash
-      recreate: "{{ 'yes' if image.changed else 'no' }}"
+      recreate: "{{ 'yes' if image.changed or config.changed else 'no' }}"
+      ports:
+          - "12201:12201/udp"
       links:
           - influxdb
       volumes:
