@@ -8,6 +8,7 @@
   template:
       src: "Dockerfile.j2"
       dest: "/opt/data/logstash/Dockerfile"
+  register: dockerfile
 
 - name: Copy logstash configs
   template:
@@ -20,6 +21,7 @@
 
 - name: Create logstash image
   docker_image:
+      force: "{{ 'yes' if dockerfile.changed else 'no' }}"
       path: "/opt/data/logstash"
       name: "logstash"
   register: image

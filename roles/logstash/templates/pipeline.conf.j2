@@ -22,30 +22,36 @@ input {
     interval => 300
     codec => "json"
   }
-  gelf{
-    id => "docker-logs"
-  }
+  gelf{}
 }
 
 filter {
-  if [id] == "docker-logs" {
+  if [message] =~ /.*accepted.*/ {
+
+    grok {
+      match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\..*"}
+    }
+
     mutate {
-      remove_field => ["headers"]
+      add_field => ["miner_name", "%{container_name}"]
     }
-    if [message] =~ /.*accepted.*/ {
-      grok {
-        match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\.diff\s(?<difficult>\d*).*"}
-      }
-      mutate {
-        add_field => ["miner_name", "%{container_name}"]
-      }
-      mutate {
-        add_field => {
-            "[@metadata][measurement]" => "miner"
-        }
+    mutate {
+      add_field => {
+          "[@metadata][measurement]" => "miner"
       }
     }
-    drop {}
+    mutate {
+      remove_field => "[command]"
+      remove_field => "[container_id]"
+      remove_field => "[created]"
+      remove_field => "[host]"
+      remove_field => "[image_id]"
+      remove_field => "[image_name]"
+      remove_field => "[level]"
+      remove_field => "[source_host]"
+      remove_field => "[tag]"
+      remove_field => "[version]"
+    }
   } else {
   if [type] == "json" {
     json {
@@ -73,6 +79,7 @@ filter {
     }
   }
 }
+
 
 output {
   influxdb {
