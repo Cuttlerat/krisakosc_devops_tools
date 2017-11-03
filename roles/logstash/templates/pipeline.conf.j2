@@ -22,27 +22,35 @@ input {
     interval => 300
     codec => "json"
   }
-  gelf{}
+  gelf{
+    id => "docker-logs"
+  }
 }
 
 filter {
-  if [message] =~ /.*accepted.*/ {
-
-    grok {
-      match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\..*"}
-    }
-
+  if [id] == "docker-logs" {
     mutate {
-      add_field => ["miner_name", "%{container_name}"]
+      remove_field => ["headers"]
     }
-    mutate {
-      add_field => {
-          "[@metadata][measurement]" => "miner"
+    if [message] =~ /.*accepted.*/ {
+      grok {
+        match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\.diff\s(?<difficult>\d*).*"}
+      }
+      mutate {
+        add_field => ["miner_name", "%{container_name}"]
+      }
+      mutate {
+        add_field => {
+            "[@metadata][measurement]" => "miner"
+        }
       }
     }
+    drop {}
   } else {
-  json {
-    source => "message"
+  if [type] == "json" {
+    json {
+      source => "message"
+    }
   }
 
   mutate {
