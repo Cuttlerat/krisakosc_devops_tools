@@ -1,0 +1,18 @@
+---
+- hosts: all
+  gather_facts: true
+  roles:
+    - common
+    - nginx-companion
+    - lets-encrypt
+    - influxdb
+    - telegraf
+    - logstash
+    - grafana
+    - pybot
+    - cuttlerat_ru
+    - fastpost
+    - files_hotkosc
+    - hastebin
+    - minecraft-server
+    - monero-miner
