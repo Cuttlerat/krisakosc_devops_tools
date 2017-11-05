@@ -29,7 +29,7 @@ filter {
   if [message] =~ /.*accepted.*/ {
 
     grok {
-      match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\..*"}
+      match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\..*diff\s*(?<difficult>\d*).*"}
     }
 
     mutate {
