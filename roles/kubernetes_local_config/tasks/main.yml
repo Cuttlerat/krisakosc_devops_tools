@@ -1,0 +1,24 @@
+---
+- name: Ensure .kube directory is exist
+  file:
+    path: "{{ ansible_env.HOME }}/.kube"
+    state: directory
+
+- name: Copy admin.conf to ~/.kube
+  copy:
+    src: "/tmp/admin.conf"
+    dest: "{{ ansible_env.HOME }}/.kube/admin.conf"
+    owner: "{{ ansible_user_id }}"
+
+- name: Delete admin.conf from the home directory
+  file:
+    path: "/tmp/admin.conf"
+    state: absent
+
+- name: Add export var in .bashrc
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.bashrc"
+    line: "export KUBECONFIG=$HOME/.kube/admin.conf"
+    state: present
+    insertafter: EOF
+    create: yes

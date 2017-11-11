@@ -1,0 +1,9 @@
+---
+- hosts: all
+  roles:
+    - kubernetes
+
+- hosts: localhost
+  gather_facts: yes
+  roles:
+    - { role: kubernetes_local_config, when: kubernetes_copy_config == True }
