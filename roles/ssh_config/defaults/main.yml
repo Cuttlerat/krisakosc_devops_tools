@@ -1,0 +1,5 @@
+---
+ssh_config_user: "{{ ansible_user_id }}"
+ssh_config_home: "/home/{{ ansible_user_id }}"
+ssh_config_group: users
+ssh_config_order: 20
