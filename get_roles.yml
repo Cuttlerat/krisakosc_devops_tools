@@ -1,0 +1,6 @@
+---
+- src: https://github.com/jdauphant/ansible-role-ssh-config
+  name: ssh_config
+  
+- src: https://github.com/gantsign/ansible-role-kubernetes
+  name: kubernetes

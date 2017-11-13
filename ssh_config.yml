@@ -1,0 +1,11 @@
+---
+ - hosts: all
+   sudo: no
+   gather_facts: yes
+
+ - hosts: localhost
+   connection: local
+   sudo: false
+   gather_facts: yes
+   roles:
+    - ssh_config
