@@ -1,0 +1,26 @@
+---
+- name: Ensure ejaberd directory is exists
+  file:
+    path: "{{ base_dir }}/ejabberd"
+    state: directory
+    
+- name: Creating ejabberd container
+  docker_container:
+    image: "rroemhild/ejabberd:{{ ejabberd_version }}"
+    name: ejabberd
+    ports:
+      - "5222:5222"
+      - "5269:5269"
+      - "5280:5280"
+    hostname: "xmpp.hotkosc.ru"
+    volumes:
+      - "{{ base_dir }}/ejabberd:/opt/data/ejabberd"
+    env:
+      XMPP_DOMAIN: "hotkosc.ru"
+      ERLANG_NODE: "ejabberd"
+      EJABBERD_ADMINS: "{{ ejabberd_admins }}"
+      EJABBERD_USERS: "{{ ejabberd_users }}"
+      EJABBERD_HTTPS: "false"
+      EJABBERD_LOGLEVEL: "5"
+      TZ: "Europe/Moscow"
+      
