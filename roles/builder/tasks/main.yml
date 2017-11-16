@@ -3,6 +3,16 @@
   copy:
       src: "files/builder.sh"
       dest: "/opt/data/pybot/builder.sh"
+      mode: 0700
 
+- name: Install packages
+  package:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - inotify-tools
+    - daemon
+
+#TODO make it idempotent
 - name: Run builder
-  shell: daemon -- /opt/data/pybot/buildes.sh &>/var/log/builder.log
+  command: bash -c "daemon -- /opt/data/pybot/builder.sh &>/var/log/builder.log"
