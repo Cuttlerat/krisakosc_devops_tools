@@ -1,0 +1,59 @@
+---
+- name: Ensure directory is exists
+  file:
+    path: "{{ base_dir }}/neobug"
+    state: directory
+
+- name: Pull git repo
+  git:
+    repo: https://github.com/kosc/neobug
+    dest: "{{ base_dir }}/neobug"
+
+- name: Copy default config
+  template:
+    src: local_settings.py.j2
+    dest: "{{ base_dir }}/neobug/neobug/local_settings.py"
+    
+- name: Create database container
+  docker_container:
+    image: "mongo:{{ mongo_version }}"
+    recreate: yes
+    name: neobug_mongo
+    volumes:
+      - "{{ base_dir }}/neobug/data:/data/db"
+    expose:
+      - 27017
+      
+- name: Create neobug image
+  docker_image:
+    path: "{{ base_dir }}/neobug"
+    dockerfile: "dockerfiles/neobug.Dockerfile"
+    name: neobug
+
+- name: Create neobug container
+  docker_container:
+    image: neobug
+    name: neobug
+    recreate: yes
+    restart_policy: always
+    command: "uwsgi --socket 0.0.0.0:5000 --chdir /usr/src/neobug --module neobug:neobug"
+    links:
+      - neobug_mongo
+    volumes:
+      - "{{ base_dir }}/neobug:/usr/src/neobug"
+
+- name: Create nginx container
+  docker_container:
+    name: neobug_nginx
+    image: "nginx:{{ nginx_version }}"
+    recreate: yes
+    volumes:
+      - "{{ base_dir }}/neobug/nginx:/etc/nginx/conf.d"
+    links:
+      - neobug:uwsgi
+    env:
+        VIRTUAL_HOST: neobug.hotkosc.ru
+        VIRTUAL_PORT: 80
+        LETSENCRYPT_HOST: neobug.hotkosc.ru
+        LETSENCRYPT_EMAIL: hotkosc@gmail.com
+    
