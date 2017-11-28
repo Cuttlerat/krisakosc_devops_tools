@@ -11,7 +11,7 @@
 
 - name: Start grafana container
   docker_container:
-    image: grafana/grafana:4.3.0-beta1
+    image: "grafana/grafana:{{ grafana_version }}"
     name: grafana
     env:
         VIRTUAL_HOST: monitoring.cuttlerat.ru
