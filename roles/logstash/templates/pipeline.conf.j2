@@ -41,16 +41,7 @@ filter {
       }
     }
     mutate {
-      remove_field => "[command]"
-      remove_field => "[container_id]"
-      remove_field => "[created]"
-      remove_field => "[host]"
-      remove_field => "[image_id]"
-      remove_field => "[image_name]"
-      remove_field => "[level]"
-      remove_field => "[source_host]"
-      remove_field => "[tag]"
-      remove_field => "[version]"
+      remove_field => ["command", "container_id", "created", "host", "image_id", "image_name", "level", "source_host", "tag", "version"]
     }
   } else {
   if [type] == "json" {
