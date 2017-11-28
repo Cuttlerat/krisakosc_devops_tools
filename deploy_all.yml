@@ -10,12 +10,10 @@
     - logstash
     - grafana
     - pybot
-    - builder
-  # - ejabberd
-    - webdav
     - cuttlerat_ru
     - fastpost
     - files_hotkosc
     - hastebin
+    - neobug
     - minecraft-server
     - monero-miner
