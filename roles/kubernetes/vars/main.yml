@@ -1,5 +1,0 @@
----
-kubernetes_supported_node_type:
-  - worker
-  - master
-  - admin

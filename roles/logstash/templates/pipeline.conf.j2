@@ -10,6 +10,7 @@ input {
     request_timeout => 60
     interval => 60
     codec => "json"
+    type => http
   }
   http_poller {
     urls => {
@@ -21,51 +22,61 @@ input {
     request_timeout => 60
     interval => 300
     codec => "json"
+    type => http
   }
   gelf{}
 }
 
 filter {
-  if [message] =~ /.*accepted.*/ {
+  if [type] != "http" {
+    if [message] =~ /.*accepted.*/ {
 
-    grok {
-      match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\..*diff\s*(?<difficult>\d*).*"}
-    }
+      grok {
+        match => {"message" => ".*accepted:\s(?<hashes>\d*).*\)\,\s(?<hashrate>\d*)\..*diff\s*(?<difficult>\d*).*"}
+      }
 
-    mutate {
-      add_field => ["miner_name", "%{container_name}"]
-    }
-    mutate {
-      add_field => {
-          "[@metadata][measurement]" => "miner"
+      mutate {
+        add_field => ["miner_name", "%{container_name}"]
+      }
+      mutate {
+        add_field => {
+            "[@metadata][measurement]" => "miner"
+        }
+      }
+      mutate {
+        remove_field => ["command", "container_id", "created", "host", "image_id", "image_name", "level", "source_host", "tag", "version"]
       }
     }
-    mutate {
-      remove_field => ["command", "container_id", "created", "host", "image_id", "image_name", "level", "source_host", "tag", "version"]
-    }
   } else {
-  if [type] == "json" {
+    mutate {
+      gsub => [
+        "message", "\"([0-9]+)\.([0-9]+)\"", "\1.\2"
+      ]
+    }
     json {
       source => "message"
     }
-  }
-
-  mutate {
+    mutate {
       convert => {
           "[ticker][price]" => "float"
+          "[ticker][change]" => "float" 
+          "[ticker][target]" => "string" 
+          "[ticker][base]" => "string" 
       }
+    }
+    mutate {
       rename => {
-          "[ticker][USD]" => "price"
-          "[ticker][price]" => "price"
-          "[ticker][target]" => "target"
-          "[ticker][base]" => "base"
-      }
-      remove_field => ["ticker"]
-  }
-
-  mutate {
+        "[USD]" => "USD"
+        "[ticker][price]" => "cost"
+        "[ticker][target]" => "target"
+        "[ticker][base]" => "base"
+        "[ticker][change]" => "change"
+        }
+      remove_field => ["ticker", "command", "container_id", "created", "host", "image_id", "image_name", "level", "source_host", "tag", "version"]
+    }
+    mutate {
       add_field => {
-          "[@metadata][measurement]" => "price"
+        "[@metadata][measurement]" => "price"
       }
     }
   }
