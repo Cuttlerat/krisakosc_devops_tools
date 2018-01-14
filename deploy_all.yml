@@ -10,7 +10,6 @@
     - logstash
     - grafana
     - pybot
-    - builder
     - cuttlerat_ru
     - fastpost
     - files_hotkosc
