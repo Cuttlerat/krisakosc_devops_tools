@@ -1,0 +1,20 @@
+---
+- name: Ensure directory is exists
+  file:
+    path: "{{ base_dir }}/minio"
+    state: directory
+
+- name: Start minio container
+  docker_container:
+      image: "minio/minio:{{ minio_version }}"
+      name: minio
+      recreate: yes
+      restart_policy: always
+      command: server /data
+      env:
+          VIRTUAL_HOST: minio.cuttlerat.ru
+          VIRTUAL_PORT: 9000
+          LETSENCRYPT_HOST: minio.cuttlerat.ru
+          LETSENCRYPT_EMAIL: avkioller@gmail.com
+      volumes:
+          - "{{ base_dir }}/minio:/data"
