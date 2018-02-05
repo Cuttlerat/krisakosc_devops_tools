@@ -1,15 +1,22 @@
 ---
-#TODO git clone fastpost
 - name: Create fastpost directory
   file:
     path: /opt/data/fastpost
     state: directory
 
+- git:
+    repo: 'https://github.com/kosc/fastpost.git'
+    dest: /opt/data/fastpost
+
+- copy:
+    src: files/local_settings.py
+    dest: /opt/data/fastpost/fastpost/local_settings.py
+
 - name: Start postgres
   docker_container:
       image: postgres:9.5
       name: fastpost_postgres
-      recreate: no
+      recreate: yes
       env:
           POSTGRES_PASSWORD: "{{ postgres_password }}"
       volumes:
@@ -22,11 +29,13 @@
       path: /opt/data/fastpost
       dockerfile: /opt/data/fastpost/dockerfiles/fastpost.Dockerfile
       name: fastpost
+      force: yes
 
 - name: Start migration
   docker_container:
       image: fastpost
       name: fastpost_migration
+      recreate: yes
       volumes:
           - /opt/data/fastpost/data:/fastpost/data
           - /opt/data/fastpost/static:/fastpost/static
@@ -39,6 +48,7 @@
   docker_container:
       image: fastpost
       name: fastpost
+      recreate: yes
       volumes:
           - /opt/data/fastpost/data:/fastpost/data
       command: python manage.py runserver 0.0.0.0:8000
@@ -52,6 +62,7 @@
   docker_container:
       image: nginx:1.13.3
       name: fastpost_nginx
+      recreate: yes
       volumes:
           - /opt/data/fastpost/nginx:/etc/nginx/conf.d
           - /opt/data/fastpost/static:/fastpost/static
