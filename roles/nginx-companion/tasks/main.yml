@@ -1,4 +1,14 @@
 ---
+- name: Ensure directory is exists
+  file:
+    path: /opt/data/nginx-proxy
+    state: directory
+
+- name: Copy proxy settings
+  copy:
+    src: files/proxy_override.conf
+    dest: /opt/data/nginx-proxy/proxy_override.conf
+
 - name: Start nginx-proxy
   docker_container:
       image: "jwilder/nginx-proxy"
@@ -9,6 +19,7 @@
           - 80:80
           - 443:443
       volumes:
+          - /opt/data/nginx-proxy/proxy_override.conf:/etc/nginx/conf.d/proxy_override.conf:ro
           - /etc/nginx/vhost.d
           - /usr/share/nginx/html
           - /etc/nginx/certs:/etc/nginx/certs:ro
