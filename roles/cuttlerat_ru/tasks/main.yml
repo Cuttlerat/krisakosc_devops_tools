@@ -30,7 +30,7 @@
 
 - name: Start php container
   docker_container:
-      image: "php:7-fpm"
+      image: "php:{{ php_version }}"
       name: php
       recreate: yes
       restart_policy: always
@@ -40,7 +40,7 @@
 
 - name: Start nginx container
   docker_container:
-      image: "nginx"
+      image: "nginx:{{ nginx_version }}"
       name: cuttlerat-ru
       recreate: yes
       restart_policy: always
