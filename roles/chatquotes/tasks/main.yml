@@ -1,0 +1,49 @@
+---
+- name: Create chatquotes directory
+  file:
+    path: "{{ base_dir }}/chatquotes"
+    state: directory
+
+- name: Get repo
+  git:
+    repo: 'https://github.com/kosc/chatquotes.git'
+    dest: "{{ base_dir }}/chatquotes"
+
+- name: Build image
+  docker_image:
+    path: "{{ base_dir }}/chatquotes"
+    name: chatquotes
+    force: yes
+
+- name: Start migrations
+  docker_container:
+    image: chatquotes
+    name: chatquotes_migration
+    recreate: yes
+    env:
+      DATABASE_PATH: "/db/base.sql"
+    volumes:
+      - "{{ base_dir }}/chatquotes_db:/db"
+    command: "migrate"
+    state: started
+
+- name: Start chatquotes
+  docker_container:
+    image: chatquotes
+    name: chatquotes
+    recreate: yes
+    env:
+      DEBUG: "False"
+      DATABASE_PATH: "/db/base.sql"
+      ALLOWED_HOST: 'chatquotes.hotkosc.ru'
+      VIRTUAL_HOST: chatquotes.hotkosc.ru
+      VIRTUAL_PORT: 8000
+      LETSENCRYPT_HOST: chatquotes.hotkosc.ru
+      LETSENCRYPT_EMAIL: hotkosc@gmail.com
+    volumes:
+      - "{{ base_dir }}/chatquotes_db:/db"
+    command: "runserver 0.0.0.0:8000"
+    expose:
+      - "8000"
+    restart_policy: always
+    state: started
