@@ -1,8 +1,16 @@
 ---
 - name: Create chatquotes directory
   file:
-    path: "{{ base_dir }}/chatquotes"
+    path: "{{ base_dir }}/{{ item }}"
     state: directory
+  with_items:
+    - "chatquotes"
+    - "chatquotes_nginx"
+
+- name: Copy nginx config
+  copy:
+    src: "chatquotes.conf"
+    dest: "{{ base_dir }}/chatquotes_nginx/chatquotes.conf"
 
 - name: Get repo
   git:
@@ -15,7 +23,21 @@
     name: chatquotes
     force: yes
 
-- name: Start migrations
+- name: Create a static volume
+  docker_volume:
+    name: chatquotes_static
+
+- name: Collect static
+  docker_container:
+    image: chatquotes
+    name: chatquotes_static
+    recreate: yes
+    volumes:
+      - "chatquotes_static:/chatquotes/static"
+    command: "collectstatic"
+    state: started
+
+- name: Run migrations
   docker_container:
     image: chatquotes
     name: chatquotes_migration
@@ -36,14 +58,28 @@
       DEBUG: "False"
       DATABASE_PATH: "/db/base.sql"
       ALLOWED_HOST: 'chatquotes.hotkosc.ru'
-      VIRTUAL_HOST: chatquotes.hotkosc.ru
-      VIRTUAL_PORT: 8000
-      LETSENCRYPT_HOST: chatquotes.hotkosc.ru
-      LETSENCRYPT_EMAIL: hotkosc@gmail.com
     volumes:
       - "{{ base_dir }}/chatquotes_db:/db"
+      - "chatquotes_static:/chatquotes/static"
     command: "runserver 0.0.0.0:8000"
     expose:
       - "8000"
     restart_policy: always
     state: started
+
+- name: Run nginx container
+  docker_container:
+    image: "nginx:{{ chatquotes_nginx_version }}"
+    name: "chatquotes_nginx"
+    recreate: yes
+    env:
+      VIRTUAL_HOST: chatquotes.hotkosc.ru
+      VIRTUAL_PORT: 80
+      LETSENCRYPT_HOST: chatquotes.hotkosc.ru
+      LETSENCRYPT_EMAIL: hotkosc@gmail.com
+    links:
+      - chatquotes
+    volumes:
+      - "chatquotes_static:/chatquotes/static"
+      - "{{ base_dir }}/chatquotes_nginx/chatquotes.conf:/etc/nginx/conf.d/chatquotes.conf:ro"
+
