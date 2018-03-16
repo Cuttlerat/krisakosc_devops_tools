@@ -13,6 +13,8 @@
   docker_container:
     image: "grafana/grafana:{{ grafana_version }}"
     name: grafana
+    recreate: yes
+    restart_policy: always
     env:
         VIRTUAL_HOST: monitoring.cuttlerat.ru
         VIRTUAL_PORT: 3000
