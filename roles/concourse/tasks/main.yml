@@ -1,0 +1,76 @@
+---
+- name: Ensure directory is exists
+  file:
+    path: "/opt/data/concourse"
+    state: directory
+
+- name: Ensure keys directories is exists
+  file:
+    path: "/opt/data/concourse/keys/{{ item }}"
+    state: directory
+  with_items:
+    - "worker"
+    - "web"
+
+- name: Copy ssh keys
+  copy:
+    src: "files/concourse/{{ item }}"
+    dest: "/opt/data/concourse/keys"
+    directory_mode: yes
+  with_items:
+    - "web"
+    - "worker"
+  
+- name: Run concourse-db container
+  docker_container:
+    image: "postgres:{{ concourse_postgres_version }}"
+    name: "concourse-db"
+    volumes:
+      - "/opt/data/concourse/db_data:/data"
+    env:
+      POSTGRES_DB: "concourse"
+      POSTGRES_USER: "{{ concourse_db_user }}"
+      POSTGRES_PASSWORD: "{{ concourse_db_password }}"
+      PGDATA: "/data"
+    restart_policy: always
+
+- name: Run concourse-web container
+  docker_container:
+    image: "concourse/concourse:{{ concourse_version }}"
+    name: "concourse-web"
+    command: web
+    links:
+      - concourse-db
+    expose:
+      - 8080
+    volumes:
+      - "/opt/data/concourse/keys/web:/concourse-keys"
+    restart_policy: always
+    env:
+      CONCOURSE_BASIC_AUTH_USERNAME: "{{ concourse_username }}"
+      CONCOURSE_BASIC_AUTH_PASSWORD: "{{ concourse_password }}"
+      CONCOURSE_EXTERNAL_URL: "{{ concourse_hostname }}"
+      CONCOURSE_POSTGRES_HOST: "concourse-db"
+      CONCOURSE_POSTGRES_DATABASE: "concourse"
+      CONCOURSE_POSTGRES_USER: "{{ concourse_db_user }}"
+      CONCOURSE_POSTGRES_PASSWORD: "{{ concourse_db_password }}"
+      VIRTUAL_HOST: ci.cuttlerat.ru
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: ci.cuttlerat.ru
+      LETSENCRYPT_EMAIL: avkioller@gmail.com
+
+- name: Run concourse-worker container
+  docker_container:
+    image: "concourse/concourse:{{ concourse_version }}"
+    name: "concourse-worker"
+    privileged: true
+    command: worker
+    links:
+      - concourse-web
+    volumes:
+      - "/opt/data/concourse/keys/worker:/concourse-keys"
+    restart_policy: always
+    env:
+      CONCOURSE_TSA_HOST: "concourse-web"
+      CONCOURSE_GARDEN_NETWORK: 
+      CONCOURSE_BAGGAGECLAIM_DRIVER: btrfs

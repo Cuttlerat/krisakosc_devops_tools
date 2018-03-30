@@ -11,8 +11,8 @@
 
 - name: Start nginx-proxy
   docker_container:
-      image: "jwilder/nginx-proxy"
-      name: nginx-proxy
+      image: "jwilder/nginx-proxy:0.6.0"
+      name: nginx-companion
       recreate: yes
       restart_policy: always
       ports:

@@ -9,14 +9,21 @@
       src: "telegraf.conf.j2"
       dest: "/opt/data/telegraf/telegraf.conf"
 
+- name: Copy who.sh script
+  copy:
+    src: "who.sh"
+    dest: "/opt/data/telegraf/who.sh"
+    mode: 0555
+
 - name: Start telegraf container
   docker_container:
-      image: telegraf
+      image: telegraf:1.5.3
       name: telegraf
       recreate: yes
       volumes:
           - /opt/data/telegraf/telegraf.conf:/etc/telegraf/telegraf.conf:ro
           - /var/run/docker.sock:/var/run/docker.sock:ro
+          - /opt/data/telegraf/who.sh:/who.sh:ro
           - /sys:/rootfs/sys:ro
           - /proc:/rootfs/proc:ro
           - /etc:/rootfs/etc:ro

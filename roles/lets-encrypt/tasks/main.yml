@@ -9,4 +9,4 @@
           - /etc/nginx/certs:/etc/nginx/certs
           - /var/run/docker.sock:/var/run/docker.sock:ro
       volumes_from:
-          - nginx-proxy
+          - nginx-companion
