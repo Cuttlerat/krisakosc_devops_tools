@@ -1,0 +1,14 @@
+tokens:
+  tg_token: "{{ telegram_token }}"
+  weather_token: "{{ weather_token }}"
+telegram:
+  mode: Webhook
+  webhook_port: {{ webhook_port }}
+  webhook_url: {{ webhook_url }}{}
+  listen_ip: 0.0.0.0
+database:
+  host: data/pybot.db
+admins:
+{% for user in pybot_admins %}
+  - {{ user }}
+{% endfor %}

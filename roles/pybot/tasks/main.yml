@@ -8,8 +8,8 @@
 
 - name: create config
   template:
-      src: "tokens.py.j2"
-      dest: "/opt/data/pybot/tokens/tokens.py"
+      src: "config.yml.j2"
+      dest: "/opt/data/pybot/config/config.yml"
       owner: root
       mode: 0600
   register: config_file
@@ -29,4 +29,4 @@
           LETSENCRYPT_EMAIL: avkioller@gmail.com
       volumes:
           - /opt/data/pybot/data:/pybot/data
-          - /opt/data/pybot/tokens:/pybot/tokens
+          - /opt/data/pybot/config:/pybot/config
