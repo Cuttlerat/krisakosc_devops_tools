@@ -20,7 +20,7 @@
   with_items:
     - "web"
     - "worker"
-  
+
 - name: Run concourse-db container
   docker_container:
     image: "postgres:{{ concourse_postgres_version }}"
