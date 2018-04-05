@@ -41,6 +41,7 @@
     command: web
     links:
       - concourse-db
+      - influxdb
     expose:
       - 8080
     volumes:
@@ -54,13 +55,18 @@
       CONCOURSE_POSTGRES_DATABASE: "concourse"
       CONCOURSE_POSTGRES_USER: "{{ concourse_db_user }}"
       CONCOURSE_POSTGRES_PASSWORD: "{{ concourse_db_password }}"
+      CONCOURSE_INFLUXDB_URL: "http://influxdb:8086"
+      CONCOURSE_INFLUXDB_DATABASE: "{{ influxdb_db }}"
+      CONCOURSE_INFLUXDB_USERNAME: "{{ influxdb_user }}"
+      CONCOURSE_INFLUXDB_PASSWORD: "{{ influxdb_password }}"
+      CONCOURSE_INFLUXDB_INSECURE_SKIP_VERIFY: true
       VIRTUAL_HOST: ci.cuttlerat.ru
       VIRTUAL_PORT: 8080
       LETSENCRYPT_HOST: ci.cuttlerat.ru
       LETSENCRYPT_EMAIL: avkioller@gmail.com
 
 - name: Run concourse-worker container
-  docker_container:
+  docker_container: 
     image: "concourse/concourse:{{ concourse_version }}"
     name: "concourse-worker"
     privileged: true
