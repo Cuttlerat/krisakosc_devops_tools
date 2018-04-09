@@ -65,7 +65,7 @@
       recreate: yes
       volumes:
           - /opt/data/fastpost/nginx:/etc/nginx/conf.d
-          - /opt/data/fastpost/static:/fastpost/static
+          - /opt/data/fastpost/static:/static
       env:
           VIRTUAL_HOST: fastpost.hotkosc.ru
           VIRTUAL_PORT: 8000
