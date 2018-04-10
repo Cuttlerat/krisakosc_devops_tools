@@ -1,53 +1,12 @@
 ---
-- name: Create miner directory
-  file:
-      path: "/opt/data/monero-miner"
-      state: directory
-
-- name: Copy templates
-  template:
-      src: "{{ item }}.j2"
-      dest: "/opt/data/monero-miner/{{ item }}"
-  with_items:
-      - Dockerfile
-      - moneroCPU.sh
-      - CPU-bind.sh
-  register: configs
-
-- name: Check scripts
-  file:
-      path: "/opt/data/monero-miner/{{ item }}"
-      mode: 0111
-  with_items:
-      - moneroCPU.sh
-      - CPU-bind.sh
-
-- name: Build image
-  docker_image:
-      name: monero_miner
-      force: "{{ 'yes' if configs.changed else 'no' }}"
-      path: "/opt/data/monero-miner"
-
-- name: Run dockers
+- name: Run miners
   docker_container:
-      image: monero_miner
+      image: "ryeguy/wolf9466-cpuminer-multi:latest"
       name: "miner_{{ item.username }}"
       recreate: "{{ 'yes' if configs.changed else 'no' }}"
       log_driver: gelf
       log_options:
           gelf-address: udp://localhost:12201
           tag: "miner_{{ item.username }}"
-      env:
-          EMAIL: "{{ item.email }}"
-          THREADS: "{{ item.threads }}"
-          USERNAME: "{{ item.username }}"
+      command: "run_minerd.sh -a cryptonight -o stratum+tcp://xmr.pool.minergate.com:45560 -u {{ item.email }} -p x -t {{ item.threads }}"
   with_items: "{{ monero_users }}"
-
-- name: Run CPU-bind
-  shell: /opt/data/monero-miner/CPU-bind.sh
-  when: configs.changed
-
-- name: Delete files
-  file:
-      path: "/opt/data/monero-miner"
-      state: absent
