@@ -1,12 +1,12 @@
 input {
   http_poller {
     urls => {
-      myresource_1_1 => "https://api.cryptonator.com/api/ticker/btc-usd"
-      myresource_1_2 => "https://api.cryptonator.com/api/ticker/bch-usd"
-      myresource_1_3 => "https://api.cryptonator.com/api/ticker/eth-usd"
-      myresource_1_4 => "https://api.cryptonator.com/api/ticker/xmr-usd"
-      myresource_1_5 => "https://min-api.cryptocompare.com/data/price?fsym=MCN&tsyms=USD"
-      }
+      btc => "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD"
+    }
+    add_field => {
+      "crypt" => "BTC"
+    }
+    target => "crypto"
     request_timeout => 60
     interval => 60
     codec => "json"
@@ -14,13 +14,53 @@ input {
   }
   http_poller {
     urls => {
-      myresource_2_1 => "https://api.cryptonator.com/api/ticker/btc-rur"
-      myresource_2_2 => "https://api.cryptonator.com/api/ticker/bch-rur"
-      myresource_2_3 => "https://api.cryptonator.com/api/ticker/eth-rur"
-      myresource_2_4 => "https://api.cryptonator.com/api/ticker/xmr-rur"
-      }
+      bch => "https://min-api.cryptocompare.com/data/price?fsym=BCH&tsyms=USD"
+    }
+    add_field => {
+      "crypt" => "BCH"
+    }
+    target => "crypto"
     request_timeout => 60
-    interval => 300
+    interval => 60
+    codec => "json"
+    type => http
+  }
+  http_poller {
+    urls => {
+      xmr => "https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=USD"
+    }
+    add_field => {
+      "crypt" => "XMR"
+    }
+    target => "crypto"
+    request_timeout => 60
+    interval => 60
+    codec => "json"
+    type => http
+  }
+  http_poller {
+    urls => {
+      eth => "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"
+    }
+    add_field => {
+      "crypt" => "ETH"
+    }
+    target => "crypto"
+    request_timeout => 60
+    interval => 60
+    codec => "json"
+    type => http
+  }
+  http_poller {
+    urls => {
+      mcn => "https://min-api.cryptocompare.com/data/price?fsym=MCN&tsyms=USD"
+    }
+    add_field => {
+      "crypt" => "MCN"
+    }
+    target => "crypto"
+    request_timeout => 60
+    interval => 60
     codec => "json"
     type => http
   }
@@ -43,9 +83,6 @@ filter {
             "[@metadata][measurement]" => "miner"
         }
       }
-      mutate {
-        remove_field => ["command", "container_id", "created", "host", "image_id", "image_name", "level", "source_host", "tag", "version"]
-      }
     }
   } else {
     mutate {
@@ -56,29 +93,21 @@ filter {
     json {
       source => "message"
     }
-    mutate {
-      convert => {
-          "[ticker][price]" => "float"
-          "[ticker][change]" => "float" 
-          "[ticker][target]" => "string" 
-          "[ticker][base]" => "string" 
-      }
-    }
+  }
+  if [crypto] {
     mutate {
       rename => {
-        "[USD]" => "USD"
-        "[ticker][price]" => "cost"
-        "[ticker][target]" => "target"
-        "[ticker][base]" => "base"
-        "[ticker][change]" => "change"
-        }
-      remove_field => ["ticker", "command", "container_id", "created", "host", "image_id", "image_name", "level", "source_host", "tag", "version"]
-    }
-    mutate {
+        "[crypto][crypt]" => "[crypt]"
+        "[crypto][USD]" => "[USD]"
+      }
+      remove_field => "[crypto]"
       add_field => {
         "[@metadata][measurement]" => "price"
       }
     }
+  }
+  mutate {
+    remove_field => ["command", "container_id", "created", "host", "image_id", "image_name", "level", "source_host", "tag", "version"]
   }
 }
 
@@ -93,6 +122,6 @@ output {
     measurement => "%{[@metadata][measurement]}"
     use_event_fields_for_data_points => true
     retention_policy => "two_weeks"
-    send_as_tags => ["target", "base", "miner_name"]
+    send_as_tags => ["target", "crypt", "miner_name"]
   }
 }
