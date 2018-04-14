@@ -77,6 +77,6 @@
       - "/opt/data/concourse/keys/worker:/concourse-keys"
     restart_policy: always
     env:
-      CONCOURSE_TSA_HOST: "concourse-web"
+      CONCOURSE_TSA_HOST: "concourse-web:2222"
       CONCOURSE_GARDEN_NETWORK: 
       CONCOURSE_BAGGAGECLAIM_DRIVER: btrfs
