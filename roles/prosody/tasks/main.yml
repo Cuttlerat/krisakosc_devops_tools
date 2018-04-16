@@ -26,6 +26,10 @@
       - 5222:5222
       - 5269:5269 
     env:
+      VIRTUAL_HOST: hotkosc.ru
+      VIRTUAL_PORT: 80
+      LETSENCRYPT_HOST: hotkosc.ru
+      LETSENCRYPT_EMAIL: avkioller@gmail.com
       DOMAIN: hotkosc.ru 
       PASSWORD: "{{ jabber_password }}"
     volumes:
