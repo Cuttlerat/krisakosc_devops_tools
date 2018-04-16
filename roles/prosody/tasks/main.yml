@@ -1,0 +1,35 @@
+---
+- name: Ensure directory is exists
+  file:
+    path: "/opt/data/prosody/config"
+    state: directory
+    
+- name: Copy config
+  template:
+    src: prosody.cfg.lua.j2
+    dest: "/opt/data/prosody/config/prosody.cfg.lua"
+
+- name: Ensure database is exists
+  file:
+    path: "/opt/data/prosody/config/prosody.sqlite"
+    state: touch
+    owner: 102
+    group: 106
+
+- name: Start container
+  docker_container:
+    image: prosody/prosody:0.9
+    name: prosody
+    recreate: yes
+    restart_policy: always
+    ports:
+      - 5222:5222
+      - 5269:5269 
+    env:
+      DOMAIN: hotkosc.ru 
+      PASSWORD: "{{ jabber_password }}"
+    volumes:
+      - "/opt/data/prosody/config/prosody.cfg.lua:/etc/prosody/prosody.cfg.lua"
+      - "/opt/data/prosody/config/prosody.sqlite:/var/lib/prosody/prosody.sqlite"
+    #  - "/logs/prosody:/var/log/prosody"
+    #  - "/data/prosody/modules:/usr/lib/prosody-modules"

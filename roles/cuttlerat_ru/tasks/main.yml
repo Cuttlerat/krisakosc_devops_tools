@@ -22,11 +22,14 @@
 - name: Create temp file
   copy:
     content: ""
-    dest: "/opt/data/cuttlerat.ru/temp/tmp"
+    dest: "/opt/data/cuttlerat.ru/temp/{{ item }}"
     force: no
     group: root
     owner: root
     mode: 0666
+  with_items:
+    - "tmp"
+    - "tmp.coverage"
 
 - name: Start php container
   docker_container:

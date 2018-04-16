@@ -1,0 +1,12 @@
+---
+- name: Start container
+  docker_container:
+    name: pybot-coverage
+    image: cuttlerat/pybot-coverage
+    restart_policy: always
+    env:
+      VIRTUAL_HOST: coverage.cuttlerat.ru
+      VIRTUAL_PORT: 80
+      LETSENCRYPT_HOST: coverage.cuttlerat.ru
+      LETSENCRYPT_EMAIL: avkioller@gmail.com
+
