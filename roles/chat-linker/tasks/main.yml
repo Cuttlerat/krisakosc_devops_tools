@@ -1,0 +1,24 @@
+---
+- name: Clone git repo
+  git:
+    repo: https://github.com/jt3k/chat-linker
+    dest: "/opt/data/chat-linker"
+
+- name: Copy config
+  template:
+    src: "app-config.json.j2"
+    dest: "/opt/data/chat-linker/app-config.json"
+
+- name: Build image
+  docker_image:
+    name: chat-linker
+    path: "/opt/data/chat-linker/"
+
+- name: Start container
+  docker_container:
+    image: chat-linker
+    name: chat-linker
+    restart_policy: always
+    recreate: "{{ 'yes' if force_update else 'no' }}"
+    
+    

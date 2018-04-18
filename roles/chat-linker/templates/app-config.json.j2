@@ -1,0 +1,24 @@
+{
+  "jabber": {
+    "connection": {
+      "jid": "{{ jabber_bot_jid }}",
+      "password": "{{ jabber_bot_password }}"
+    },
+    "prod": {
+      "room": "{{ jabber_bot_room }}",
+      "nick": "{{ jabber_bot_nick }}",
+      "pingMs": 30000
+    },
+    "messageTemplate": "<@{name}> {message}"
+  },
+  "telegram": {
+    "BOT_TOKEN": "{{ jabber_bot_token }}",
+    "prod": {
+      "id": {{ jabber_bot_id }},
+      "title": "{{ jabber_bot_title }}",
+      "username": "{{ jabber_bot_username }}",
+      "type": "supergroup"
+    },
+    "messageTemplate": "<b>{name}</b>\n{message}"
+  }
+}
