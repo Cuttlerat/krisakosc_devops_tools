@@ -3,7 +3,7 @@
   docker_container:
       image: "ryeguy/wolf9466-cpuminer-multi:latest"
       name: "miner_{{ item.username }}"
-      recreate: "{{ 'yes' if configs.changed else 'no' }}"
+      recreate: "{{ 'yes' if force_update else 'no' }}"
       log_driver: gelf
       log_options:
           gelf-address: udp://localhost:12201
