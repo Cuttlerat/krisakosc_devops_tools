@@ -13,6 +13,7 @@
   docker_image:
     name: chat-linker
     path: "/opt/data/chat-linker/"
+    force: "{{ 'yes' if force_update else 'no' }}"
 
 - name: Start container
   docker_container:
