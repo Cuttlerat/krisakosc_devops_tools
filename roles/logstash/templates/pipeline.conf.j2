@@ -113,15 +113,28 @@ filter {
 
 
 output {
-  influxdb {
-    idle_flush_time => 10
-    host => "influxdb"
-    user => "{{ influxdb_user }}"
-    password => "{{ influxdb_password }}"
-    db => "metrics"
-    measurement => "%{[@metadata][measurement]}"
-    use_event_fields_for_data_points => true
-    retention_policy => "two_weeks"
-    send_as_tags => ["target", "crypt", "miner_name"]
+  if [crypt] {
+    influxdb {
+      idle_flush_time => 10
+      host => "influxdb"
+      user => "{{ influxdb_user }}"
+      password => "{{ influxdb_password }}"
+      db => "{{ influxdb_crypto_db }}"
+      measurement => "%{[@metadata][measurement]}"
+      use_event_fields_for_data_points => true
+      send_as_tags => ["crypt"]
+    }
+  } else {
+    influxdb {
+      idle_flush_time => 10
+      host => "influxdb"
+      user => "{{ influxdb_user }}"
+      password => "{{ influxdb_password }}"
+      db => "metrics"
+      measurement => "%{[@metadata][measurement]}"
+      use_event_fields_for_data_points => true
+      retention_policy => "two_weeks"
+      send_as_tags => ["target", "miner_name"]
+    }
   }
 }

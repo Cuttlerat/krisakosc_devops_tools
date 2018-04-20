@@ -26,3 +26,4 @@
   with_items:
     - "q=CREATE USER {{ influxdb_user }} WITH PASSWORD '{{ influxdb_password }}' WITH ALL PRIVILEGES"
     - "q=CREATE DATABASE \"{{ influxdb_db }}\" WITH DURATION 14d NAME \"two_weeks\""
+    - "q=CREATE DATABASE \"{{ influxdb_crypto_db }}\""
