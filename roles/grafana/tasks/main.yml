@@ -13,7 +13,7 @@
   docker_container:
     image: "grafana/grafana:{{ grafana_version }}"
     name: grafana
-    recreate: yes
+    recreate: "{{ 'yes' if force_update | default(False) else 'no' }}"
     restart_policy: always
     env:
         VIRTUAL_HOST: monitoring.cuttlerat.ru
