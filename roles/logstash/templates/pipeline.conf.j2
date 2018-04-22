@@ -1,7 +1,8 @@
 input {
   http_poller {
     urls => {
-      btc => "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD"
+      #btc => "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=USD"
+      btc => "https://bittrex.com/api/v1.1/public/getticker?market=USDT-BTC"
     }
     add_field => {
       "crypt" => "BTC"
@@ -14,7 +15,8 @@ input {
   }
   http_poller {
     urls => {
-      bch => "https://min-api.cryptocompare.com/data/price?fsym=BCH&tsyms=USD"
+      #btc => "https://min-api.cryptocompare.com/data/price?fsym=BTC&tsyms=BCH"
+      bch => "https://bittrex.com/api/v1.1/public/getticker?market=USDT-BCC"
     }
     add_field => {
       "crypt" => "BCH"
@@ -27,7 +29,8 @@ input {
   }
   http_poller {
     urls => {
-      xmr => "https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=USD"
+      #xmr => "https://min-api.cryptocompare.com/data/price?fsym=XMR&tsyms=USD"
+      xmr => "https://bittrex.com/api/v1.1/public/getticker?market=USDT-XMR"
     }
     add_field => {
       "crypt" => "XMR"
@@ -40,7 +43,8 @@ input {
   }
   http_poller {
     urls => {
-      eth => "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"
+      #eth => "https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=USD"
+      eth => "https://bittrex.com/api/v1.1/public/getticker?market=USDT-ETH"
     }
     add_field => {
       "crypt" => "ETH"
@@ -51,19 +55,19 @@ input {
     codec => "json"
     type => http
   }
-  http_poller {
-    urls => {
-      mcn => "https://min-api.cryptocompare.com/data/price?fsym=MCN&tsyms=USD"
-    }
-    add_field => {
-      "crypt" => "MCN"
-    }
-    target => "crypto"
-    request_timeout => 60
-    interval => 60
-    codec => "json"
-    type => http
-  }
+  #http_poller {
+  #  urls => {
+  #    mcn => "https://min-api.cryptocompare.com/data/price?fsym=MCN&tsyms=USD"
+  #  }
+  #  add_field => {
+  #    "crypt" => "MCN"
+  #  }
+  #  target => "crypto"
+  #  request_timeout => 60
+  #  interval => 60
+  #  codec => "json"
+  #  type => http
+  #}
   gelf{}
 }
 
@@ -98,7 +102,8 @@ filter {
     mutate {
       rename => {
         "[crypto][crypt]" => "[crypt]"
-        "[crypto][USD]" => "[USD]"
+        "[crypto][result][Bid]" => "[bid]"
+        "[crypto][result][Ask]" => "[ask]"
       }
       remove_field => "[crypto]"
       add_field => {
