@@ -9,6 +9,8 @@
       src: "grafana.ini.j2"
       dest: "/opt/data/grafana/config/grafana.ini"
 
+- include_tasks: candlestick_plugin.yml
+
 - name: Start grafana container
   docker_container:
     image: "grafana/grafana:{{ grafana_version }}"

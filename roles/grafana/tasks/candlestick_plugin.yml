@@ -1,0 +1,18 @@
+---
+- name: Ensure npm is installed
+  package:
+    name: npm
+    state: present
+
+- name: Ensure directory is exists
+  file:
+    path: "/opt/data/grafana/plugins"
+
+- name: Get git repo
+  git:
+    repo: https://github.com/ilgizar/ilgizar-candlestick-panel
+    dest: "/opt/data/grafana/plugins/ilgizar-candlestick-panel"
+
+- name: Install node dependencies
+  npm:
+    path: "/opt/data/grafana/plugins/ilgizar-candlestick-panel"
