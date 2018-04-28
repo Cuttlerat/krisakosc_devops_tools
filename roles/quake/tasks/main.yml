@@ -8,23 +8,28 @@
   get_url:
     url: "https://github.com/nrempel/q3-server/blob/master/baseq3/pak0.pk3"
     dest: "/opt/data/quake/pak0.pk3"
+    mode: 0770
     checksum: sha256:7ce8b3910620cd50a09e4f1100f426e8c6180f68895d589f80e6bd95af54bcae
 
 - name: Copy config
   template:
     src: "config.cfg.j2"
     dest: "/opt/data/quake/config.cfg"
+    mode: 0777
 
 - name: Start container
   docker_container:
     image: jberrenberg/quake3
     name: quake
+    #user: root
     recreate: "{{ 'yes' if force_update | default(False) else 'no' }}"
     restart_policy: always
+    network_mode: host
+    command: "+set sv_hostname hotkosc.ru +seta net_ip 95.213.143.169 +seta net_port 27960 +exec config.cfg"
     ports:
       - 27960:27960/udp
     env:
       PAK0: /pak0.pk3
     volumes:
-      - "/opt/data/quake/config.cfg:/home/ioq3srv/.q3a/baseq3/q3config_server.cfg"
+      - "/opt/data/quake/config.cfg:/home/ioq3srv/.q3a/baseq3/config.cfg"
       - "/opt/data/quake/pak0.pk3:/pak0.pk3"

@@ -1,27 +1,23 @@
 #!/usr/bin/env bash
 
-encrypt() {
-    ansible-vault encrypt $(cat .encrypt_list | xargs) --vault-password-file .vault
-}
-
-decrypt() {
-    ansible-vault decrypt $(cat .encrypt_list | xargs) --vault-password-file .vault
+ansible_vault() {
+    ansible-vault "$1" $(cat .encrypt_list | xargs) --vault-password-file .vault
 }
 
 case $1 in
     encrypt)
-        encrypt
+        ansible_vault encrypt
         ;;
     decrypt)
-        decrypt
+        ansible_vault decrypt
         ;;
     push)
-        encrypt
+        ansible_vault encrypt
         shift
         [[ "$*" == "" ]] && MESSAGE="Fast commit" || MESSAGE="$*"
         git add .
         git commit -m "${MESSAGE}"
         git push
-        decrypt
+        ansible_vault decrypt
         ;;
 esac
