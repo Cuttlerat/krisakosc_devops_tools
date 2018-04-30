@@ -10,6 +10,9 @@
       dest: "/opt/data/grafana/config/grafana.ini"
 
 - include_tasks: candlestick_plugin.yml
+  when:
+    - update_candlesticks is defined
+    - update_candlesticks
 
 - name: Start grafana container
   docker_container:
