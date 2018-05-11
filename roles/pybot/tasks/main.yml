@@ -3,10 +3,12 @@
   include_vars:
     file: files/tokens.yml
 
-- name: Sreate directory
-  file: dest=/opt/data/pybot state=directory
+- name: Create directory
+  file:
+    dest: /opt/data/pybot
+    state: directory
 
-- name: create config
+- name: Create config
   template:
       src: "config.yml.j2"
       dest: "/opt/data/pybot/config/config.yml"
@@ -21,7 +23,7 @@
       recreate: "{{ 'yes' if config_file.changed else 'no' }}"
       restart_policy: always
       expose:
-          - 10033
+        - 10033
       env:
           VIRTUAL_HOST: tokens.cuttlerat.ru
           VIRTUAL_PORT: 10033
