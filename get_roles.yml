@@ -4,3 +4,6 @@
   
 - src: https://github.com/gantsign/ansible-role-kubernetes
   name: kubernetes
+
+- src: https://github.com/nickhammond/ansible-logrotate.git
+  name: logrotate

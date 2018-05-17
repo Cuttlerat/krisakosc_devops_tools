@@ -1,0 +1,15 @@
+---
+galaxy_info:
+  author: John Freeman
+  description: Role for installing Kubernetes.
+  company: GantSign Ltd.
+  license: MIT
+  min_ansible_version: 2.3
+  platforms:
+    - name: Ubuntu
+      versions:
+        - xenial
+  galaxy_tags:
+    - kubernetes
+    - docker
+dependencies: []
