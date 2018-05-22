@@ -1,0 +1,23 @@
+---
+
+- name: Ensure directory is exists
+  file:
+    path: /opt/data/jenkins
+    state: directory
+
+- name: Run docker container
+  docker_container:
+    name: jenkins
+    image: getintodevops/jenkins-withdocker:lts
+    recreate: "{{ 'yes' if force_update else 'no' }}"
+    privileged: true
+    restart_policy: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/data/jenkins:/var/jenkins_home
+    env:
+      VIRTUAL_HOST: jenkins.cuttlerat.ru
+      VIRTUAL_PORT: 8080
+      LETSENCRYPT_HOST: jenkins.cuttlerat.ru
+      LETSENCRYPT_EMAIL: avkioller@gmail.com
+
