@@ -25,9 +25,9 @@
       expose:
         - 10033
       env:
-          VIRTUAL_HOST: tokens.cuttlerat.ru
+          VIRTUAL_HOST: yoba.cuttlerat.ru
           VIRTUAL_PORT: 10033
-          LETSENCRYPT_HOST: tokens.cuttlerat.ru
+          LETSENCRYPT_HOST: yoba.cuttlerat.ru
           LETSENCRYPT_EMAIL: avkioller@gmail.com
       volumes:
           - /opt/data/pybot/data:/pybot/data

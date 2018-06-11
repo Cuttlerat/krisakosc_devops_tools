@@ -1,0 +1,35 @@
+---
+elasticsearch_gpg_url: "https://packages.elastic.co/GPG-KEY-elasticsearch"
+filebeat_major_version: 6
+
+### Config
+# Fields
+filebeat_custom_fields:
+  key: value
+  test: test
+
+# Prospectors
+filebeat_prospectors:
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/dmesg
+
+# Kafka output
+filebeat_certs_dir: "/opt/filebeat/certs"
+filebeat_ssl_ca: "{{ filebeat_certs_dir }}/ca.pem"
+filebeat_ssl_cert: "{{ filebeat_certs_dir }}/cert.pem"
+filebeat_ssl_key: "{{ filebeat_certs_dir }}/cert.key"
+#kafka_username: admin
+#kafka_password: admin
+filebeat_kafka_topic: logs
+filebeat_required_acks: 1
+filebeat_compression: gzip
+filebeat_max_message_bytes: 10000
+    
+# Filebeat logging
+filebeat_logging_enable: true
+filebeat_logging_level: info
+filebeat_logging_dir: "/var/log/filebeat"
+filebeat_logging_filename: "filebeat.log"
+filebeat_logging_keepfiles: 7

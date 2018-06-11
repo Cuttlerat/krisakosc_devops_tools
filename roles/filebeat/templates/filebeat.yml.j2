@@ -1,0 +1,50 @@
+# Ansible managed
+{% if filebeat_custom_fields is defined %}
+fields:
+{% for key, value in filebeat_custom_fields.items() %}
+  {{ key }}: {{ value }}
+{% endfor %}
+{% endif %}
+
+{% if filebeat_prospectors is defined %}
+filebeat.prospectors:
+{{ filebeat_prospectors | to_nice_yaml }}
+{# {% for prospector in filebeat_prospectors %} #}
+{# {{ prospector }} #}
+{# {% endfor %} #}
+{% endif %}
+ 
+output.kafka:
+  hosts:
+{% for host in groups['kafka'] %}
+  - {{ hostvars[host].ansible_host }}:{{ hostvars[host].kafka_broker_port }}
+{% endfor %}
+  ssl:
+    certificate_authorities:
+    - "{{ filebeat_ssl_ca }}"
+    certificate: "{{ filebeat_ssl_cert }}"
+    key: "{{ filebeat_ssl_key }}"
+{% if kafka_username is defined %}
+  username: {{ kafka_username }}
+{% if kafka_password is defined %}
+  password: {{ kafka_password }}
+{% endif %}
+{% endif %}
+  topic: '{{ filebeat_kafka_topic }}'
+  partition:
+    round_robin:
+      reachable_only: true
+  required_acks: {{ filebeat_required_acks }}
+  compression: {{ filebeat_compression }}
+  max_message_bytes: {{ filebeat_max_message_bytes }}
+
+{% if filebeat_logging_enable %}
+logging:
+  level: {{ filebeat_logging_level }}
+  to_files: true
+  to_syslog: false
+  files:
+    path: {{ filebeat_logging_dir }}
+    name: {{ filebeat_logging_filename }}
+    keepfiles: {{ filebeat_logging_keepfiles }}
+{% endif %}

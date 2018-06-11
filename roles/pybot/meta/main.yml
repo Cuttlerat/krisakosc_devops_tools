@@ -1,0 +1,4 @@
+---
+dependecies:
+  - nginx-companion
+  - lets-encrypt

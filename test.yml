@@ -1,0 +1,9 @@
+---
+- hosts: dedicated
+  vars:
+    test: test1
+  tasks:
+    - debug: 
+        msg: |
+          Testing var
+          {{ ansible_fqdn }}

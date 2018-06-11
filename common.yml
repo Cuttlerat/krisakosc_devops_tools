@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: dedicated
   gather_facts: true
   roles:
     - common

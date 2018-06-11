@@ -1,0 +1,19 @@
+---
+- hosts: dedicated
+  tasks:
+    - name: Rotate kern
+      logrotate:
+        name: kern
+        path: /var/log/kern.log
+      args:
+        options:
+          - rotate 4
+          - weekly
+          - missingok
+          - notifempty
+          - compress
+          - delaycompress
+          - sharedscripts
+          - su syslog adm
+        scripts:
+          postrotate: "invoke-rc.d rsyslog rotate > /dev/null"

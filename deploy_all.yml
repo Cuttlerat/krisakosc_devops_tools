@@ -1,5 +1,5 @@
 ---
-- hosts: all
+- hosts: dedicated
   gather_facts: true
   roles:
     - common
@@ -9,7 +9,7 @@
     - telegraf
     - logstash
     - grafana
-    - pybot
+    #- pybot
     - cuttlerat_ru
     - fastpost
     - files_hotkosc
@@ -18,3 +18,10 @@
     - minecraft-server
     - monero-miner
     - minio
+
+- hosts: aws
+  gather_facts: true
+  roles:
+    - common
+    - pybot
+    - chat-linker

@@ -1,0 +1,51 @@
+---
+#- name: "Import elasticsearch GPG key"
+#  rpm_key:
+#    key: "{{ elasticsearch_gpg_url }}"
+#    state: present
+
+#- name: "Add filebeat repository"
+#  template:
+#    src: "{{ role_path }}/templates/filebeat.repo.j2"
+#    dest: "/etc/yum.repos.d/filebeat.repo"
+#    mode: 0400
+#
+#- name: "Install filebeat"
+#  yum:
+#    name: "filebeat"
+#    state: present
+#
+#- name: "Ensure certs dir is exists"
+#  file:
+#    path: "{{ filebeat_certs_dir }}"
+#    state: directory
+#    owner: "root"
+#    group: "root"
+#    mode: 0700
+#
+#- name: "Copy SSL certs for kafka output"
+#  copy:
+#    src: "filebeat/{{ item }}"
+#    dest: "{{ filebeat_certs_dir }}"
+#    owner: "root"
+#    group: "root"
+#    mode: 0400
+#  with_items:
+#    - "ca.pem"
+#    - "cert.pem"
+#    - "cert.key"
+
+- name: "Configure filebeat"
+  template:
+    src: "{{ role_path }}/templates/filebeat.yml.j2"
+    dest: "/opt/data/filebeat/filebeat.yml"
+    owner: "root"
+    group: "root"
+    mode: 0400
+  notify: Restart filebeat
+
+#- name: Start filebeat
+#  service:
+#    name: filebeat
+#    state: started
+#    enabled: yes

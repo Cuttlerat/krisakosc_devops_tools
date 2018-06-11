@@ -1,5 +1,5 @@
 ---
- - hosts: all
+ - hosts: dedicated
    sudo: no
    gather_facts: yes
 

@@ -1,0 +1,8 @@
+[elastic-6.x]
+name=Elastic repository for {{ filebeat_major_version }}.x packages
+baseurl=https://artifacts.elastic.co/packages/{{ filebeat_major_version }}.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
