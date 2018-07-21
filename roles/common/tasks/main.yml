@@ -10,7 +10,7 @@
   pip:
     name: "{{ item }}"
   with_items:
-    - docker-py==1.9.0 # https://github.com/ansible/ansible-modules-core/issues/5335
+    - docker
 
 - name: check that the docker is not installed
   command: which docker
